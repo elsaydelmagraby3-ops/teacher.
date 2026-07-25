@@ -507,6 +507,12 @@
             border-color: var(--danger-color);
         }
 
+        .form-control[readonly] {
+            background: var(--border-color);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
         select.form-control {
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236c757d' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
@@ -651,6 +657,56 @@
             display: none !important;
         }
 
+        .btn-verify {
+            background: var(--primary-color);
+            color: white;
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-verify:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-verify:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .divider::before {
+            margin-right: 15px;
+        }
+
+        .divider::after {
+            margin-left: 15px;
+        }
+
         @media (max-width: 768px) {
             .options {
                 grid-template-columns: 1fr;
@@ -717,6 +773,39 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--text-muted);
         }
+
+        .hidden-field {
+            display: none;
+        }
+
+        /* تحسين مظهر الخانة الواحدة */
+        .single-input-wrapper {
+            position: relative;
+        }
+
+        .single-input-wrapper .form-control {
+            padding-right: 45px;
+        }
+
+        .single-input-wrapper .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+
+        .input-hint {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        .input-hint i {
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body data-theme="light">
@@ -760,7 +849,7 @@
             <div id="student-info-state" class="card" style="display: none;">
                 <!-- Exam Title -->
                 <div class="exam-title-top" id="exam-title-top">📝 تحميل الامتحان...</div>
-                <div class="exam-subtitle" id="exam-subtitle">يرجى إدخال بياناتك للمتابعة</div>
+                <div class="exam-subtitle" id="exam-subtitle">يرجى إدخال رقم الهاتف أو رقم الحجز للتحقق</div>
 
                 <!-- Time Status -->
                 <div id="time-status" class="time-status"></div>
@@ -794,26 +883,38 @@
                 </div>
 
                 <form id="student-info-form">
+                    <!-- خانة واحدة للتحقق (رقم الهاتف أو رقم الحجز) -->
+                    <div class="form-group full-width">
+                        <label>رقم الهاتف أو رقم الحجز <span class="required">*</span></label>
+                        <div class="single-input-wrapper">
+                            <i class="fa-solid fa-magnifying-glass input-icon"></i>
+                            <input type="text" id="student-identifier" class="form-control" required placeholder="أدخل رقم هاتفك أو رقم الحجز">
+                        </div>
+                        <div class="input-hint">
+                            <i class="fa-regular fa-circle-info"></i>
+                            يمكنك إدخال رقم الهاتف أو رقم الحجز للتحقق من بياناتك
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-verify" id="verify-btn">
+                        <i class="fa-solid fa-check-circle"></i> التحقق من البيانات
+                    </button>
+
+                    <div class="divider">---</div>
+
+                    <!-- Step 2: Read-only Name and Grade (filled automatically) -->
                     <div class="student-info">
                         <div class="form-group full-width">
                             <label>اسم الطالب <span class="required">*</span></label>
-                            <input type="text" id="student-name" class="form-control" required placeholder="أدخل اسمك الكامل">
-                        </div>
-                        <div class="form-group full-width">
-                            <label>كود الطالب <span class="required">*</span></label>
-                            <input type="text" id="student-code" class="form-control" required placeholder="أدخل كود الطالب الخاص بك">
+                            <input type="text" id="student-name" class="form-control" readonly placeholder="سيتم تعبئته تلقائياً" required>
                         </div>
                         <div class="form-group full-width">
                             <label>الصف الدراسي <span class="required">*</span></label>
-                            <select id="student-grade" class="form-control" required>
-                                <option value="">-- اختر الصف الدراسي --</option>
-                                <option value="الصف الأول الإعدادي">الصف الأول الإعدادي</option>
-                                <option value="الصف الثاني الإعدادي">الصف الثاني الإعدادي</option>
-                                <option value="الصف الثالث الإعدادي">الصف الثالث الإعدادي</option>
-                            </select>
+                            <input type="text" id="student-grade" class="form-control" readonly placeholder="سيتم تعبئته تلقائياً" required>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-start" id="start-exam-btn">
+
+                    <button type="submit" class="btn btn-primary btn-start" id="start-exam-btn" disabled>
                         <i class="fa-solid fa-play"></i> بدء الامتحان
                     </button>
                 </form>
@@ -909,7 +1010,7 @@
                 <div class="percentage" id="result-percentage">0%</div>
                 <div class="details">
                     <p><strong>الطالب:</strong> <span id="result-student-name">-</span></p>
-                    <p><strong>كود الطالب:</strong> <span id="result-student-code">-</span></p>
+                    <p><strong>رقم الهاتف:</strong> <span id="result-student-phone">-</span></p>
                     <p><strong>الامتحان:</strong> <span id="result-exam-name">-</span></p>
                     <p><strong>تاريخ الحل:</strong> <span id="result-date">-</span></p>
                     <p><strong>عدد الإجابات الصحيحة:</strong> <span id="result-correct">0</span></p>
@@ -970,6 +1071,12 @@
         const progressFill = document.getElementById('progress-fill');
         const progressText = document.getElementById('progress-text');
         const startExamBtn = document.getElementById('start-exam-btn');
+        const verifyBtn = document.getElementById('verify-btn');
+
+        // Student info fields - خانة واحدة
+        const studentIdentifierInput = document.getElementById('student-identifier');
+        const studentNameInput = document.getElementById('student-name');
+        const studentGradeInput = document.getElementById('student-grade');
 
         // Preview elements
         const previewExamName = document.getElementById('exam-title-top');
@@ -995,8 +1102,9 @@
         let examData = null;
         let examId = null;
         let studentName = '';
-        let studentCode = '';
+        let studentPhone = '';
         let studentGrade = '';
+        let studentBookingId = '';
         let userAnswers = {};
         let isSubmitted = false;
         let maxAttempts = 1;
@@ -1012,6 +1120,8 @@
         let remainingTime = 0;
         let isTimeUp = false;
         let isAutoSubmitted = false;
+        let isVerified = false;
+        let verifiedData = null;
 
         // ===== Toast System =====
         function showToast(message, type = 'success', duration = 3500) {
@@ -1069,8 +1179,9 @@
         }
 
         // ===== Get Student ID =====
-        function getStudentId(name, code) {
-            return `${name.trim()}_${code.trim()}_${examId}`.replace(/\s+/g, '_');
+        function getStudentId(phone, bookingId) {
+            const id = phone ? phone.trim() : bookingId.trim();
+            return `${id}_${examId}`.replace(/\s+/g, '_');
         }
 
         // ===== Format Time =====
@@ -1218,7 +1329,7 @@
                 
                 const examName = examData.title || examData.name || 'غير محدد';
                 previewExamName.textContent = `📝 ${examName}`;
-                document.getElementById('exam-subtitle').textContent = 'يرجى إدخال بياناتك للمتابعة';
+                document.getElementById('exam-subtitle').textContent = 'يرجى إدخال رقم الهاتف أو رقم الحجز للتحقق';
                 previewExamGrade.textContent = examData.grade || 'غير محدد';
                 previewExamQuestions.textContent = examData.questions ? examData.questions.length : 0;
                 previewExamDuration.textContent = examData.duration ? `${examData.duration} دقيقة` : 'غير محدد';
@@ -1287,7 +1398,7 @@
             
             document.getElementById('result-total').textContent = '0';
             document.getElementById('result-student-name').textContent = studentName || '-';
-            document.getElementById('result-student-code').textContent = studentCode || '-';
+            document.getElementById('result-student-phone').textContent = studentPhone || '-';
             document.getElementById('result-exam-name').textContent = examData?.title || examData?.name || '-';
             document.getElementById('result-percentage').textContent = '0%';
             document.getElementById('result-percentage').className = 'percentage poor';
@@ -1303,7 +1414,7 @@
                     <i class="fa-solid ${icon}"></i> ${message}
                 </div>
                 <p><strong>الطالب:</strong> ${studentName || '-'}</p>
-                <p><strong>كود الطالب:</strong> ${studentCode || '-'}</p>
+                <p><strong>رقم الهاتف:</strong> ${studentPhone || '-'}</p>
                 <p><strong>الامتحان:</strong> ${examData?.title || examData?.name || '-'}</p>
             `;
             
@@ -1348,12 +1459,102 @@
             return true;
         }
 
+        // ===== Verify Student (Phone OR Booking ID) - خانة واحدة =====
+        async function verifyStudent() {
+            const identifier = studentIdentifierInput.value.trim();
+
+            if (!identifier) {
+                showToast('يرجى إدخال رقم الهاتف أو رقم الحجز', 'error');
+                studentIdentifierInput.classList.add('error');
+                return;
+            }
+
+            studentIdentifierInput.classList.remove('error');
+
+            try {
+                showLoader();
+                verifyBtn.disabled = true;
+                verifyBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التحقق...';
+
+                // البحث باستخدام phone أو bookingId
+                const bookingsRef = collection(db, "bookings");
+                
+                // استعلامين: واحد بالرقم كـ phone والآخر كـ bookingId
+                const q1 = query(bookingsRef, where("phone", "==", identifier));
+                const q2 = query(bookingsRef, where("bookingId", "==", identifier));
+                
+                const [snapshot1, snapshot2] = await Promise.all([
+                    getDocs(q1),
+                    getDocs(q2)
+                ]);
+
+                let foundDoc = null;
+                let foundData = null;
+
+                // دمج النتائج
+                if (!snapshot1.empty) {
+                    foundDoc = snapshot1.docs[0];
+                    foundData = foundDoc.data();
+                } else if (!snapshot2.empty) {
+                    foundDoc = snapshot2.docs[0];
+                    foundData = foundDoc.data();
+                }
+
+                if (!foundDoc || !foundData) {
+                    showToast('بيانات التسجيل غير صحيحة، لا يمكنك دخول الامتحان', 'error', 5000);
+                    // Reset fields
+                    studentNameInput.value = '';
+                    studentGradeInput.value = '';
+                    studentName = '';
+                    studentGrade = '';
+                    studentPhone = '';
+                    studentBookingId = '';
+                    isVerified = false;
+                    verifiedData = null;
+                    startExamBtn.disabled = true;
+                    return;
+                }
+
+                // Found matching document
+                const fetchedName = foundData.name || '';
+                const fetchedGrade = foundData.grade || '';
+                const fetchedPhone = foundData.phone || '';
+                const fetchedBookingId = foundData.bookingId || '';
+
+                // Auto-fill name and grade
+                studentNameInput.value = fetchedName;
+                studentGradeInput.value = fetchedGrade;
+
+                // Save to state
+                studentName = fetchedName;
+                studentGrade = fetchedGrade;
+                studentPhone = fetchedPhone;
+                studentBookingId = fetchedBookingId;
+                verifiedData = foundData;
+
+                isVerified = true;
+                startExamBtn.disabled = false;
+
+                showToast(`✅ تم التحقق بنجاح! مرحباً ${fetchedName}`, 'success');
+
+            } catch (error) {
+                console.error('Error verifying student:', error);
+                showToast('حدث خطأ أثناء التحقق: ' + error.message, 'error');
+            } finally {
+                hideLoader();
+                verifyBtn.disabled = false;
+                verifyBtn.innerHTML = '<i class="fa-solid fa-check-circle"></i> التحقق من البيانات';
+            }
+        }
+
         // ===== Start Exam =====
-        async function startExam(name, code, grade) {
-            studentName = name;
-            studentCode = code;
-            studentGrade = grade;
-            studentId = getStudentId(name, code);
+        async function startExam() {
+            if (!isVerified) {
+                showToast('يرجى التحقق من بياناتك أولاً', 'warning');
+                return;
+            }
+
+            studentId = getStudentId(studentPhone, studentBookingId);
 
             try {
                 showLoader();
@@ -1362,9 +1563,9 @@
                     return;
                 }
                 
-                if (examData.grade && grade !== examData.grade) {
+                // Check if student's grade matches exam grade
+                if (examData.grade && studentGrade !== examData.grade) {
                     showToast('⚠️ هذا الامتحان غير مخصص لصفك الدراسي', 'error', 4000);
-                    document.getElementById('student-grade').classList.add('error');
                     return;
                 }
                 
@@ -1437,7 +1638,8 @@
                     examId: examId,
                     studentId: studentId,
                     studentName: studentName,
-                    studentCode: studentCode,
+                    studentPhone: studentPhone,
+                    studentBookingId: studentBookingId,
                     grade: studentGrade,
                     attemptNumber: currentAttemptNumber,
                     startTimestamp: startTimestamp,
@@ -1554,7 +1756,7 @@
             submitBtn.disabled = answered < total || isSubmitted || isTimeUp;
         }
 
-        // ===== Submit Exam (محسنة مع معالجة الأخطاء) =====
+        // ===== Submit Exam =====
         async function submitExam() {
             if (isSubmitted) return;
             
@@ -1601,7 +1803,7 @@
                     examId,
                     studentId,
                     studentName,
-                    studentCode,
+                    studentPhone,
                     score,
                     totalQuestions
                 });
@@ -1611,7 +1813,8 @@
                     examName: examData?.title || examData?.name || 'غير محدد',
                     examGrade: examData?.grade || 'غير محدد',
                     studentName: studentName || 'غير محدد',
-                    studentCode: studentCode || 'غير محدد',
+                    studentPhone: studentPhone || 'غير محدد',
+                    studentBookingId: studentBookingId || 'غير محدد',
                     studentGrade: studentGrade || 'غير محدد',
                     studentId: studentId || 'unknown',
                     attemptNumber: currentAttemptNumber || 1,
@@ -1695,7 +1898,7 @@
             document.getElementById('result-score').textContent = result.score || 0;
             document.getElementById('result-total').textContent = result.totalQuestions || 0;
             document.getElementById('result-student-name').textContent = result.studentName || '-';
-            document.getElementById('result-student-code').textContent = result.studentCode || '-';
+            document.getElementById('result-student-phone').textContent = result.studentPhone || '-';
             document.getElementById('result-exam-name').textContent = result.examName || '-';
             document.getElementById('result-correct').textContent = result.score || 0;
             document.getElementById('result-wrong').textContent = (result.totalQuestions || 0) - (result.score || 0);
@@ -1785,56 +1988,26 @@
         // ===== Student Info Form =====
         document.getElementById('student-info-form').addEventListener('submit', (e) => {
             e.preventDefault();
-            
-            const name = document.getElementById('student-name').value.trim();
-            const code = document.getElementById('student-code').value.trim();
-            const grade = document.getElementById('student-grade').value;
-            
-            let hasError = false;
-            
-            if (!name) {
-                document.getElementById('student-name').classList.add('error');
-                showToast('يرجى إدخال اسم الطالب', 'error');
-                hasError = true;
+            if (isVerified) {
+                startExam();
             } else {
-                document.getElementById('student-name').classList.remove('error');
+                showToast('يرجى التحقق من بياناتك أولاً باستخدام زر التحقق', 'warning');
             }
-            
-            if (!code) {
-                document.getElementById('student-code').classList.add('error');
-                showToast('يرجى إدخال كود الطالب', 'error');
-                hasError = true;
-            } else {
-                document.getElementById('student-code').classList.remove('error');
+        });
+
+        // ===== Verify Button =====
+        verifyBtn.addEventListener('click', verifyStudent);
+
+        // ===== Enter key triggers verify =====
+        studentIdentifierInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                verifyBtn.click();
             }
-            
-            if (!grade) {
-                document.getElementById('student-grade').classList.add('error');
-                showToast('يرجى اختيار الصف الدراسي', 'error');
-                hasError = true;
-            } else {
-                document.getElementById('student-grade').classList.remove('error');
-            }
-            
-            if (hasError) return;
-            
-            if (examData.grade && grade !== examData.grade) {
-                document.getElementById('student-grade').classList.add('error');
-                showToast('⚠️ هذا الامتحان غير مخصص لصفك الدراسي', 'error', 4000);
-                return;
-            }
-            
-            startExam(name, code, grade);
         });
 
         // ===== Remove error class on focus =====
-        document.getElementById('student-name').addEventListener('focus', function() {
-            this.classList.remove('error');
-        });
-        document.getElementById('student-code').addEventListener('focus', function() {
-            this.classList.remove('error');
-        });
-        document.getElementById('student-grade').addEventListener('focus', function() {
+        studentIdentifierInput.addEventListener('focus', function() {
             this.classList.remove('error');
         });
 
@@ -1907,7 +2080,7 @@
                
                 const examName = examData.title || examData.name || 'غير محدد';
                 previewExamName.textContent = `📝 ${examName}`;
-                document.getElementById('exam-subtitle').textContent = 'يرجى إدخال بياناتك للمتابعة';
+                document.getElementById('exam-subtitle').textContent = 'يرجى إدخال رقم الهاتف أو رقم الحجز للتحقق';
                 previewExamGrade.textContent = examData.grade || 'غير محدد';
                 previewExamQuestions.textContent = examData.questions ? examData.questions.length : 0;
                 previewExamDuration.textContent = examData.duration ? `${examData.duration} دقيقة` : 'غير محدد';
@@ -1928,8 +2101,8 @@
             }
         })();
 
-        console.log('✅ صفحة الامتحان جاهزة مع نظام الوقت والمؤقت وخانة اسم الطالب');
-        console.log('ℹ️ تم تحسين معالجة الأخطاء في الإرسال');
+        console.log('✅ صفحة الامتحان جاهزة مع خانة واحدة للتحقق');
+        console.log('ℹ️ يمكن للطالب إدخال رقم الهاتف أو رقم الحجز في خانة واحدة');
     </script>
 </body>
 </html>
